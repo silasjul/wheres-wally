@@ -1,1 +1,6 @@
 .venv
+
+data/train/
+data/valid/
+data/test/
+report_images/

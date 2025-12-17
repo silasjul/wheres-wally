@@ -244,6 +244,11 @@ def print_examples(
     plt.show()
 
 
-__all__ = ["CocoDetectionDataset", "coco_detection_collate_fn", "print_examples"]
+__all__ = [
+    "CocoDetectionDataset",
+    "coco_detection_collate_fn",
+    "slice_coco_dataset",
+    "print_examples",
+]
 
 
