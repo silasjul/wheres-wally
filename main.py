@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from utils.cli_commands import cmd_examples, cmd_find_wally
+from utils.cli_commands import cmd_build_dataset, cmd_examples, cmd_find_wally
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -29,6 +29,12 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Image number from 1 to 12 (corresponds to data/original_images/<n>.jpg)",
     )
 
+    # build-dataset: slice and balance the dataset after data has been unzipped
+    subparsers.add_parser(
+        "build-dataset",
+        help="Slice COCO datasets and balance backgrounds after unzipping data into data/train, data/valid, and data/test",
+    )
+
     return parser
 
 
@@ -40,6 +46,8 @@ def main() -> None:
         cmd_examples(args)
     elif args.command == "find-wally":
         cmd_find_wally(args)
+    elif args.command == "build-dataset":
+        cmd_build_dataset(args)
     else:
         parser.print_help()
 

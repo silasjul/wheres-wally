@@ -1,6 +1,4 @@
 .venv
 
-data/train/
-data/valid/
-data/test/
+data/
 report_images/

@@ -1,28 +1,7 @@
 import argparse
 from pathlib import Path
 
-import matplotlib.pyplot as plt
-from PIL import Image
-
-from utils.dataset import CocoDetectionDataset, print_examples
-
-
-def cmd_examples(args: argparse.Namespace) -> None:
-    # Always use the train split and show 4 random examples.
-    base_dir = Path("data")
-    split_dir = base_dir / "train"
-    ann_file = split_dir / "_annotations.coco.json"
-
-    if not ann_file.exists():
-        raise FileNotFoundError(f"Annotations file not found: {ann_file}")
-
-    dataset = CocoDetectionDataset(
-        images_dir=split_dir,
-        annotations_file=ann_file,
-    )
-
-    print("Showing 4 random example(s) from 'train'")
-    print_examples(dataset=dataset)
+from utils.slicing import balance_dataset, slice_coco_dataset
 
 
 def cmd_find_wally(args: argparse.Namespace) -> None:
@@ -34,18 +13,26 @@ def cmd_find_wally(args: argparse.Namespace) -> None:
     if img_number < 1 or img_number > 12:
         raise ValueError("image_number must be between 1 and 12")
 
-    base_dir = Path("data") / "original_images"
+    base_dir = Path("original_images")
     img_path = base_dir / f"{img_number}.jpg"
 
     if not img_path.exists():
         raise FileNotFoundError(f"Original image not found: {img_path}")
 
-    print(f"Opening original image #{img_number}: {img_path}")
+    print(f"Original image path: {img_path}")
+    print("Displaying the image is not yet implemented in this CLI.")
 
-    image = Image.open(img_path).convert("RGB")
 
-    plt.figure(figsize=(10, 6))
-    plt.imshow(image)
-    plt.axis("off")
-    plt.title(f"Find Wally! (image {img_number})")
-    plt.show()
+def cmd_build_dataset(args: argparse.Namespace) -> None:
+    """
+    Build the sliced and balanced dataset.
+
+    Assumes that the COCO annotations and images have already been
+    unzipped into the `data/train`, `data/valid`, and `data/test`
+    folders.
+    """
+    print("Running slice_coco_dataset() ...")
+    slice_coco_dataset()
+    print("Running balance_dataset() ...")
+    balance_dataset()
+    print("Dataset build completed.")
