@@ -1,5 +1,7 @@
 .venv
 
+*.pth
+
 data/
 report_images/
 models/
