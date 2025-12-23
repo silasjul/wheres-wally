@@ -4,6 +4,13 @@ import os
 import shutil
 import random
 
+# Define the directories and annotation files created by your slice_coco_dataset function
+dataset_splits = [
+    {"dir": "data/train_sliced", "json": "data/train_sliced/_annotations.coco.json"},
+    {"dir": "data/valid_sliced", "json": "data/valid_sliced/_annotations.coco.json"},
+    {"dir": "data/test_sliced", "json": "data/test_sliced/_annotations.coco.json"},
+]
+
 def slice_coco_dataset(prune_background: bool = True) -> None:
     # Train
     slice_coco(
@@ -45,13 +52,6 @@ def slice_coco_dataset(prune_background: bool = True) -> None:
     )
 
 def balance_dataset() -> None:
-    # Define the directories and annotation files created by your slice_coco_dataset function
-    dataset_splits = [
-        {"dir": "data/train_sliced", "json": "data/train_sliced/_annotations_coco.json"},
-        {"dir": "data/valid_sliced", "json": "data/valid_sliced/_annotations_coco.json"},
-        {"dir": "data/test_sliced", "json": "data/test_sliced/_annotations_coco.json"}
-    ]
-
     TARGET_BG_RATIO = 0.10  # We want 10% of the TOTAL images to be background
 
     for split in dataset_splits:
@@ -112,6 +112,56 @@ def balance_dataset() -> None:
         print(f"  Successfully pruned {img_dir}. Final total: {len(data['images'])} images.")
 
 
+def copy_missing() -> None:
+    """
+    Ensure sliced COCO annotations keep the original metadata and filename.
+
+    SAHI writes `_annotations_coco.json` without `info` / `licenses`.
+    This function renames it to `_annotations.coco.json` and copies the
+    missing metadata from the corresponding unsliced annotations.
+    """
+    for split in dataset_splits:
+        sliced_dir = split["dir"]
+        target_json = split["json"]  # desired final name
+        legacy_json = os.path.join(sliced_dir, "_annotations_coco.json")
+        source_json = os.path.join(
+            sliced_dir.replace("_sliced", ""), "_annotations.coco.json"
+        )
+
+        if not os.path.exists(source_json):
+            print(f"Skipping {sliced_dir}: source annotations not found at {source_json}.")
+            continue
+
+        # If SAHI's default name exists, rename it to match the source naming.
+        if not os.path.exists(target_json):
+            if os.path.exists(legacy_json):
+                print(f"Renaming {legacy_json} -> {target_json}")
+                shutil.move(legacy_json, target_json)
+            else:
+                print(f"Skipping {sliced_dir}: no sliced annotations found.")
+                continue
+
+        with open(source_json, "r") as f:
+            source_data = json.load(f)
+
+        with open(target_json, "r") as f:
+            sliced_data = json.load(f)
+
+        changes = []
+        for key in ("info", "licenses"):
+            if not sliced_data.get(key) and key in source_data:
+                sliced_data[key] = source_data[key]
+                changes.append(key)
+
+        if changes:
+            with open(target_json, "w") as f:
+                json.dump(sliced_data, f, indent=4)
+            print(f"Updated {target_json}: copied {', '.join(changes)}.")
+        else:
+            print(f"No missing metadata detected for {target_json}.")
+
+
 if __name__ == "__main__":
     slice_coco_dataset()
+    copy_missing()
     balance_dataset()

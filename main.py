@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from utils.cli_commands import cmd_build_dataset, cmd_examples, cmd_find_wally
+from utils.cli_commands import cmd_build_dataset, cmd_find_wally
 
 
 def _build_parser() -> argparse.ArgumentParser:

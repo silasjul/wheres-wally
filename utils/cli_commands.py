@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from utils.slicing import balance_dataset, slice_coco_dataset
+from utils.slicing import balance_dataset, slice_coco_dataset, copy_missing
 
 
 def cmd_find_wally(args: argparse.Namespace) -> None:
@@ -33,6 +33,7 @@ def cmd_build_dataset(args: argparse.Namespace) -> None:
     """
     print("Running slice_coco_dataset() ...")
     slice_coco_dataset()
+    copy_missing()
     print("Running balance_dataset() ...")
     balance_dataset()
     print("Dataset build completed.")
