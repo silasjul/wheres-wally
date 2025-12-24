@@ -241,7 +241,7 @@ class RF_DETR:
             )
 
 if __name__ == "__main__":
-    rf_detr = RF_DETR(model_size="large")
+    rf_detr = RF_DETR(model_size="medium")
     rf_detr.metrics_test()
     rf_detr.visual_comparison_test()
 
@@ -250,8 +250,8 @@ if __name__ == "__main__":
     rf_detr.predict("original_images/10.jpg")
 
     # Valid images
-    """ rf_detr.predict("original_images/7.jpg")
-    rf_detr.predict("original_images/11.jpg") """
+    rf_detr.predict("original_images/7.jpg")
+    rf_detr.predict("original_images/11.jpg")
 
     # Train images
     """ rf_detr.predict("original_images/1.jpg")
